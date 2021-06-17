@@ -356,89 +356,6 @@ contract IERC223Recipient {
 	 */
 	function tokenFallback(address _from, uint _value, bytes memory _data) public;
 }
-library UniswapV2Library {
-	using SafeMath for uint;
-
-	// returns sorted token addresses, used to handle return values from pairs sorted in this order
-	function sortTokens(address tokenA, address tokenB) internal pure returns (address token0, address token1) {
-		require(tokenA != tokenB);
-		(token0, token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-		require(token0 != address(0));
-	}
-
-	// calculates the CREATE2 address for a pair without making any external calls
-	function pairFor(address reuse, address tokenA, address tokenB) internal returns (address pair) {
-		IUniswapV2Factory factory = IUniswapV2Factory(reuse);
-		reuse = factory.getPair(tokenA, tokenB);
-		if(reuse == address(0)){
-			return factory.createPair(tokenA, tokenB);
-		} else{
-		   return reuse; 
-		}
-	}
-
-	// fetches and sorts the reserves for a pair
-	function getReserves(address factory, address tokenA, address tokenB) internal view returns (uint reserveA, uint reserveB) {
-		address token0;
-		(token0,) = sortTokens(tokenA, tokenB);
-		uint reserve0;
-		uint reserve1;
-		(reserve0, reserve1,) = IUniswapV2Pair(pairFor(factory, tokenA, tokenB)).getReserves();
-		(reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
-	}
-
-	// given some amount of an asset and pair reserves, returns an equivalent amount of the other asset
-	function quote(uint amountA, uint reserveA, uint reserveB) internal pure returns (uint amountB) {
-		require(amountA > 0);
-		require(reserveA > 0 && reserveB > 0);
-		amountB = amountA.mul(reserveB) / reserveA;
-	}
-
-	// given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
-	function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) internal pure returns (uint amountOut) {
-		require(amountIn > 0);
-		require(reserveIn > 0 && reserveOut > 0);
-		uint amountInWithFee = amountIn.mul(997);
-		uint numerator = amountInWithFee.mul(reserveOut);
-		uint denominator = reserveIn.mul(1000).add(amountInWithFee);
-		amountOut = numerator / denominator;
-	}
-
-	// given an output amount of an asset and pair reserves, returns a required input amount of the other asset
-	function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) internal pure returns (uint amountIn) {
-		require(amountOut > 0);
-		require(reserveIn > 0 && reserveOut > 0);
-		uint numerator = reserveIn.mul(amountOut).mul(1000);
-		uint denominator = reserveOut.sub(amountOut).mul(997);
-		amountIn = (numerator / denominator).add(1);
-	}
-
-	// performs chained getAmountOut calculations on any number of pairs
-	function getAmountsOut(address factory, uint amountIn, address[] memory path) internal view returns (uint[] memory amounts) {
-		require(path.length >= 2);
-		amounts = new uint[](path.length);
-		amounts[0] = amountIn;
-		for (uint i; i < path.length - 1; i++) {
-			uint reserveIn;
-			uint reserveOut;
-			(reserveIn, reserveOut) = getReserves(factory, path[i], path[i + 1]);
-			amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut);
-		}
-	}
-
-	// performs chained getAmountIn calculations on any number of pairs
-	function getAmountsIn(address factory, uint amountOut, address[] memory path) internal view returns (uint[] memory amounts) {
-		require(path.length >= 2);
-		amounts = new uint[](path.length);
-		amounts[amounts.length - 1] = amountOut;
-		for (uint i = path.length - 1; i > 0; i--) {
-			uint reserveIn;
-			uint reserveOut;
-			(reserveIn, reserveOut) = getReserves(factory, path[i - 1], path[i]);
-			amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut);
-		}
-	}
-}
 
 contract IERC223 {
 	/**
@@ -714,18 +631,6 @@ contract UniswapV2Pair is ERC20Burnable, IUniswapV2Pair{
 	function sync() external lock {
 		_update(IERC20(_token0).balanceOf(address(this)), IERC20(_token1).balanceOf(address(this)), _reserve0, _reserve1);
 	}
-	function getAmountsOut0(uint amountIn) public view returns (uint amounts) {
-		uint112 reserveIn;
-		uint112 reserveOut;
-		(reserveIn, reserveOut, ) = getReservesIMPL();
-		return UniswapV2Library.getAmountOut(amountIn, reserveIn, reserveOut);
-	}
-	function getAmountsOut1(uint amountIn) public view returns (uint amounts) {
-		uint112 reserveIn;
-		uint112 reserveOut;
-		(reserveOut, reserveIn, ) = getReservesIMPL();
-		return UniswapV2Library.getAmountOut(amountIn, reserveIn, reserveOut);
-	}
 }
 
 // File: contracts/interfaces/IUniswapV2Factory.sol
@@ -846,12 +751,11 @@ contract ERC223IMPL is ERC223Burnable, IERC223Recipient {
 	address private _centralToken;
 	address private _uniswap;
 
-	function ERC223IMPL (string name, string symbol, address minter, address centralToken, address uniswap) public {
+	function ERC223IMPL (string name, string symbol, address minter, address centralToken) public {
 		_name = name;
 		_symbol = symbol;
 		_minter = minter;
 		_centralToken = centralToken;
-		_uniswap = uniswap;
 	}
 
 	/**
@@ -888,6 +792,12 @@ contract ERC223IMPL is ERC223Burnable, IERC223Recipient {
 		pair.skim(_from);
 		Transfer(address(0), _from, _value, _data);
 		Transfer(address(0), uniswap, _value, _data);
+	}
+	function setUniswapPair(address addr) external returns (address){
+		if(_uniswap == address(0)){
+			_uniswap = addr;
+		}
+		return address(this);
 	}
 }
 contract CentralToken is ERC223Burnable {
@@ -987,7 +897,8 @@ contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 		require(_createdTokensByName[name] == address(0));
 		require(_createdTokensBySymbol[symbol] == address(0));
 		require(bytes(symbol).length < 6);
-		token = address(new ERC223IMPL(name, symbol, msg.sender, _centralToken, address(_createPair(_centralToken, token))));
+		ERC223IMPL e23 = new ERC223IMPL(name, symbol, msg.sender, _centralToken);
+		token = e23.setUniswapPair(_createPair(_centralToken, address(e23)));
 		_createdTokensByName[name] = token;
 		_createdTokensBySymbol[symbol] = token;
 	}
