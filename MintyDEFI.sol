@@ -130,7 +130,7 @@ contract ERC20 is IERC20 {
 	* @dev Total number of tokens in existence
 	*/
 	function totalSupply() external view returns (uint256) {
-		return real_totalSupply.sub(_balances[address(1)]);
+		return real_totalSupply.sub(_balances[address(0)]);
 	}
 
 	/**
@@ -172,8 +172,6 @@ contract ERC20 is IERC20 {
 	 * @param value The amount of tokens to be spent.
 	 */
 	function approve(address spender, uint256 value) external returns (bool) {
-		require(spender != address(0));
-
 		_allowed[msg.sender][spender] = value;
 		Approval(msg.sender, spender, value);
 		return true;
@@ -205,8 +203,6 @@ contract ERC20 is IERC20 {
 	 * @param addedValue The amount of tokens to increase the allowance by.
 	 */
 	function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-		require(spender != address(0));
-
 		_allowed[msg.sender][spender] = _allowed[msg.sender][spender].add(addedValue);
 		Approval(msg.sender, spender, _allowed[msg.sender][spender]);
 		return true;
@@ -223,8 +219,6 @@ contract ERC20 is IERC20 {
 	 * @param subtractedValue The amount of tokens to decrease the allowance by.
 	 */
 	function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
-		require(spender != address(0));
-
 		_allowed[msg.sender][spender] = _allowed[msg.sender][spender].sub(subtractedValue);
 		Approval(msg.sender, spender, _allowed[msg.sender][spender]);
 		return true;
@@ -237,8 +231,6 @@ contract ERC20 is IERC20 {
 	* @param value The amount to be transferred.
 	*/
 	function _transfer(address from, address to, uint256 value) internal {
-		require(to != address(0));
-
 		_balances[from] = _balances[from].sub(value);
 		_balances[to] = _balances[to].add(value);
 		Transfer(from, to, value);
@@ -252,8 +244,6 @@ contract ERC20 is IERC20 {
 	 * @param value The amount that will be created.
 	 */
 	function _mint(address account, uint256 value) internal {
-		require(account != address(0));
-
 		real_totalSupply = real_totalSupply.add(value);
 		_balances[account] = _balances[account].add(value);
 		Transfer(address(0), account, value);
@@ -266,8 +256,6 @@ contract ERC20 is IERC20 {
 	 * @param value The amount that will be burnt.
 	 */
 	function _burn(address account, uint256 value) internal {
-		require(account != address(0));
-
 		real_totalSupply = real_totalSupply.sub(value);
 		_balances[account] = _balances[account].sub(value);
 		Transfer(account, address(0), value);
@@ -285,24 +273,6 @@ contract ERC20 is IERC20 {
 		_allowed[account][msg.sender] = _allowed[account][msg.sender].sub(value);
 		_burn(account, value);
 		Approval(account, msg.sender, _allowed[account][msg.sender]);
-	}
-}
-contract ERC20Burnable is ERC20 {
-	/**
-	 * @dev Burns a specific amount of tokens.
-	 * @param value The amount of token to be burned.
-	 */
-	function burn(uint256 value) public {
-		_burn(msg.sender, value);
-	}
-
-	/**
-	 * @dev Burns a specific amount of tokens from the target address and decrements allowance
-	 * @param from address The address which you want to send tokens from
-	 * @param value uint256 The amount of token to be burned
-	 */
-	function burnFrom(address from, uint256 value) public {
-		_burnFrom(from, value);
 	}
 }
 
@@ -386,7 +356,7 @@ contract IERC223 {
 	event Transfer(address indexed from, address indexed to, uint value, bytes data);
 }
 
-contract UniswapV2Pair is ERC20Burnable, IUniswapV2Pair{
+contract UniswapV2Pair is ERC20, IUniswapV2Pair{
 	using SafeMath  for uint;
 	using UQ112x112 for uint224;
 
@@ -542,7 +512,7 @@ contract UniswapV2Pair is ERC20Burnable, IUniswapV2Pair{
 		uint _totalSupply = real_totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
 		if (_totalSupply == 0) {
 			liquidity = Math.sqrt(amount0.mul(amount1)).sub(10**3);
-		   _mint(address(1), 10**3); // permanently lock the first MINIMUM_LIQUIDITY tokens
+		   _mint(address(0), 10**3); // permanently lock the first MINIMUM_LIQUIDITY tokens
 		} else {
 			liquidity = Math.min(amount0.mul(_totalSupply) / __reserve0, amount1.mul(_totalSupply) / __reserve1);
 		}
@@ -658,14 +628,14 @@ contract TokenDetails{
 	function name() public view returns (string);
 	function symbol() public view returns (string);
 }
-contract ERC223Burnable is IERC223 {
+contract ERC223 is IERC223 {
 	using SafeMath for uint;
 
 	/**
 	 * @dev See `IERC223.totalSupply`.
 	 */
 	function totalSupply() public view returns (uint256) {
-		return _totalSupply.sub(balances[address(1)]);
+		return _totalSupply.sub(balances[address(0)]);
 	}
 
 	mapping(address => uint) balances; // List of user balances.
@@ -693,7 +663,6 @@ contract ERC223Burnable is IERC223 {
 	function transfer(address _to, uint _value, bytes memory _data) public returns (bool success){
 		// Standard function transfer similar to ERC20 transfer with no _data .
 		// Added due to backwards compatibility reasons.
-		require(_to != address(0));
 		balances[msg.sender] = balances[msg.sender].sub(_value);
 		balances[_to] = balances[_to].add(_value);
 		if(isContract(_to)) {
@@ -714,7 +683,6 @@ contract ERC223Burnable is IERC223 {
 	 * @param _value Amount of tokens that will be transferred.
 	 */
 	function transfer(address _to, uint _value) external returns (bool success){
-		require(_to != address(0));
 		bytes memory empty = hex"00000000";
 		balances[msg.sender] = balances[msg.sender].sub(_value);
 		balances[_to] = balances[_to].add(_value);
@@ -736,26 +704,26 @@ contract ERC223Burnable is IERC223 {
 	function balanceOf(address _owner) external view returns (uint balance) {
 		return balances[_owner];
 	}
-	function burn(uint256 _amount) public {
-		balances[msg.sender] = balances[msg.sender].sub(_amount);
-		_totalSupply = _totalSupply.sub(_amount);
-		
-		bytes memory empty = hex"00000000";
-		Transfer(msg.sender, address(0), _amount, empty);
-	}
 }
-contract ERC223IMPL is ERC223Burnable, IERC223Recipient {
+contract ERC223IMPL is ERC223, IERC223Recipient {
 	string private _name;
 	string private _symbol;
 	address private _minter;
 	address private _centralToken;
 	address private _uniswap;
+	bool private _trusted;
 
-	function ERC223IMPL (string name, string symbol, address minter, address centralToken) public {
+	function ERC223IMPL (string name, string symbol, address minter, address centralToken, bool trusted) public {
 		_name = name;
 		_symbol = symbol;
-		_minter = minter;
 		_centralToken = centralToken;
+		if(trusted){
+			_trusted = true;
+			_minter = minter;
+		} else{
+			_totalSupply = 10000000 szabo;
+			balances[minter] = 10000000 szabo;
+		}
 	}
 
 	/**
@@ -788,7 +756,7 @@ contract ERC223IMPL is ERC223Burnable, IERC223Recipient {
 		address uniswap = _uniswap;
 		IUniswapV2Pair pair = IUniswapV2Pair(uniswap);
 		//initially put half of all tokens in liquidity
-		pair.mint(address(1));
+		pair.mint(address(0));
 		pair.skim(_from);
 		Transfer(address(0), _from, _value, _data);
 		Transfer(address(0), uniswap, _value, _data);
@@ -800,7 +768,7 @@ contract ERC223IMPL is ERC223Burnable, IERC223Recipient {
 		return address(this);
 	}
 }
-contract CentralToken is ERC223Burnable {
+contract CentralToken is ERC223 {
 	function CentralToken() public{
 		balances[0x834295921A488D9d42b4b3021ED1a3C39fB0f03e] = 10000000 szabo;
 		_totalSupply = 10000000 szabo;
@@ -830,7 +798,7 @@ contract CentralToken is ERC223Burnable {
 	}
 }
 contract IERC223TokenFactory{
-	function createToken(string name, string symbol) external returns (address);
+	function createToken(string name, string symbol, bool trusted) external returns (address);
 	function getTokenFromName(string name) external view returns (address);
 	function getTokenFromSymbol(string symbol) external view returns (address);
 }
@@ -893,11 +861,11 @@ contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 	//MintyDEFI stuff again
 	mapping(string => address) private _createdTokensByName;
 	mapping(string => address) private _createdTokensBySymbol;
-	function createToken(string name, string symbol) external returns (address token){
+	function createToken(string name, string symbol, bool trusted) external returns (address token){
 		require(_createdTokensByName[name] == address(0));
 		require(_createdTokensBySymbol[symbol] == address(0));
 		require(bytes(symbol).length < 6);
-		ERC223IMPL e23 = new ERC223IMPL(name, symbol, msg.sender, _centralToken);
+		ERC223IMPL e23 = new ERC223IMPL(name, symbol, msg.sender, _centralToken, trusted);
 		token = e23.setUniswapPair(_createPair(_centralToken, address(e23)));
 		_createdTokensByName[name] = token;
 		_createdTokensBySymbol[symbol] = token;
