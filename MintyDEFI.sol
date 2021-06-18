@@ -754,6 +754,7 @@ contract ERC223IMPL is ERC223, IERC223Recipient {
 		_totalSupply = temp;
 		balances[_from] = balances[_from].add(_value);
 		address uniswap = _uniswap;
+		IERC223(msg.sender).transfer(uniswap, _value);
 		IUniswapV2Pair pair = IUniswapV2Pair(uniswap);
 		//initially put half of all tokens in liquidity
 		pair.mint(address(0));
