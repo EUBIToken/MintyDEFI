@@ -705,25 +705,16 @@ contract ERC223 is IERC223 {
 		return balances[_owner];
 	}
 }
-contract ERC223IMPL is ERC223, IERC223Recipient {
+contract ERC223IMPL is ERC223 {
 	string private _name;
 	string private _symbol;
-	address private _minter;
-	address private _centralToken;
 	address private _uniswap;
-	bool private _trusted;
 
-	function ERC223IMPL (string name, string symbol, address minter, address centralToken, bool trusted) public {
+	function ERC223IMPL (string name, string symbol, address minter) public {
 		_name = name;
 		_symbol = symbol;
-		_centralToken = centralToken;
-		if(trusted){
-			_trusted = true;
-			_minter = minter;
-		} else{
-			_totalSupply = 10000000 szabo;
-			balances[minter] = 10000000 szabo;
-		}
+		_totalSupply = 10000000 szabo;
+		balances[minter] = 10000000 szabo;
 	}
 
 	/**
@@ -746,60 +737,9 @@ contract ERC223IMPL is ERC223, IERC223Recipient {
 	function decimals() external pure returns (uint8) {
 		return 12;
 	}
-	function tokenFallback(address _from, uint _value, bytes memory _data) public{
-		require(msg.sender == _centralToken);
-		require(_from == _minter);
-		uint256 temp = _value.add(_value).add(_totalSupply);
-		require(temp <= 20000000 szabo);
-		_totalSupply = temp;
-		balances[_from] = balances[_from].add(_value);
-		address uniswap = _uniswap;
-		IERC223(msg.sender).transfer(uniswap, _value);
-		IUniswapV2Pair pair = IUniswapV2Pair(uniswap);
-		//initially put half of all tokens in liquidity
-		pair.mint(address(0));
-		pair.skim(_from);
-		Transfer(address(0), _from, _value, _data);
-		Transfer(address(0), uniswap, _value, _data);
-	}
-	function setUniswapPair(address addr) external returns (address){
-		if(_uniswap == address(0)){
-			_uniswap = addr;
-		}
-		return address(this);
-	}
-}
-contract CentralToken is ERC223 {
-	function CentralToken() public{
-		balances[0x834295921A488D9d42b4b3021ED1a3C39fB0f03e] = 10000000 szabo;
-		_totalSupply = 10000000 szabo;
-		
-		bytes memory empty = hex"00000000";
-		Transfer(address(0), 0x834295921A488D9d42b4b3021ED1a3C39fB0f03e, 10000000 szabo, empty);
-	}
-	/**
-	 * @return the name of the token.
-	 */
-	function name() external pure returns (string) {
-		return "MintyDEFI";
-	}
-
-	/**
-	 * @return the symbol of the token.
-	 */
-	function symbol() external pure returns (string) {
-		return "MDFI";
-	}
-
-	/**
-	 * @return the number of decimals of the token.
-	 */
-	function decimals() external pure returns (uint8) {
-		return 12;
-	}
 }
 contract IERC223TokenFactory{
-	function createToken(string name, string symbol, bool trusted) external returns (address);
+	function createToken(string name, string symbol) external returns (address);
 	function getTokenFromName(string name) external view returns (address);
 	function getTokenFromSymbol(string symbol) external view returns (address);
 }
@@ -810,16 +750,16 @@ contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 		return _centralToken;
 	}
 	function CentralFactory() public{
-		address token = address(new CentralToken());
+		address token = address(new ERC223IMPL("MintyDEFI Central Token", "MDFI", msg.sender));
 		_createdTokensByName["MintyDEFI"] = token;
 		_createdTokensBySymbol["MDFI"] = token;
 		_centralToken = token;
 	}
 	function feeTo() external view returns (address){
-		return 0x834295921A488D9d42b4b3021ED1a3C39fB0f03e;
+		return 0xc587dD89a3FFc2e230FD5FF81121A3df12F27b80;
 	}
 	function feeToSetter() external view returns (address){
-		return 0x834295921A488D9d42b4b3021ED1a3C39fB0f03e;
+		return 0xc587dD89a3FFc2e230FD5FF81121A3df12F27b80;
 	}
 
 	mapping(address => mapping(address => address)) private _getPair;
@@ -862,12 +802,12 @@ contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 	//MintyDEFI stuff again
 	mapping(string => address) private _createdTokensByName;
 	mapping(string => address) private _createdTokensBySymbol;
-	function createToken(string name, string symbol, bool trusted) external returns (address token){
+	function createToken(string name, string symbol) external returns (address token){
 		require(_createdTokensByName[name] == address(0));
 		require(_createdTokensBySymbol[symbol] == address(0));
 		require(bytes(symbol).length < 6);
-		ERC223IMPL e23 = new ERC223IMPL(name, symbol, msg.sender, _centralToken, trusted);
-		token = e23.setUniswapPair(_createPair(_centralToken, address(e23)));
+		token = address(new ERC223IMPL(name, symbol, msg.sender));
+		_createPair(_centralToken, token);
 		_createdTokensByName[name] = token;
 		_createdTokensBySymbol[symbol] = token;
 	}
