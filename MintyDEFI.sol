@@ -90,34 +90,25 @@ library SafeMath {
 	}
 }
 
-// File: contracts/interfaces/IUniswapV2ERC20.sol
-
-interface IUniswapV2ERC20 {
-	event Approval(address indexed owner, address indexed spender, uint value);
-	event Transfer(address indexed from, address indexed to, uint value);
-
-	function name() external pure returns (string memory);
-	function symbol() external pure returns (string memory);
-	function decimals() external pure returns (uint8);
-	function totalSupply() external view returns (uint);
-	function balanceOf(address owner) external view returns (uint);
-	function allowance(address owner, address spender) external view returns (uint);
-
-	function approve(address spender, uint value) external returns (bool);
-	function transfer(address to, uint value) external returns (bool);
-	function transferFrom(address from, address to, uint value) external returns (bool);
-
-	function DOMAIN_SEPARATOR() external view returns (bytes32);
-	function PERMIT_TYPEHASH() external pure returns (bytes32);
-	function nonces(address owner) external view returns (uint);
-
-	function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
-}
-
 // File: contracts/UniswapV2ERC20.sol
 
+contract IERC223NG is IERC20 {
+		
+	/**
+	 * @dev Transfers `value` tokens from `msg.sender` to `to` address with `data` parameter
+	 * and returns `true` on success.
+	 */
+	function transfer(address to, uint value, bytes memory data) public returns (bool);
+	function transferFrom(address from, address to, uint value, bytes memory data) public returns (bool);
+	 
+	 /**
+	 * @dev Event that is fired on successful transfer.
+	 */
+	event Transfer(address indexed from, address indexed to, uint value, bytes data);
+}
+
 //Use OpenZeppelin ERC20 Implementation
-contract ERC20 is IERC20 {
+contract ERC223NG is IERC223NG {
 	using SafeMath for uint256;
 
 	mapping (address => uint256) internal _balances;
@@ -158,7 +149,12 @@ contract ERC20 is IERC20 {
 	* @param value The amount to be transferred.
 	*/
 	function transfer(address to, uint256 value) external returns (bool) {
-		_transfer(msg.sender, to, value);
+		bytes memory empty = hex"00000000";
+		_transfer(msg.sender, to, value, empty);
+		return true;
+	}
+	function transfer(address to, uint256 value, bytes memory data) public returns (bool) {
+		_transfer(msg.sender, to, value, data);
 		return true;
 	}
 
@@ -187,7 +183,14 @@ contract ERC20 is IERC20 {
 	 */
 	function transferFrom(address from, address to, uint256 value) external returns (bool) {
 		_allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
-		_transfer(from, to, value);
+		bytes memory empty = hex"00000000";
+		_transfer(from, to, value, empty);
+		Approval(from, msg.sender, _allowed[from][msg.sender]);
+		return true;
+	}
+	function transferFrom(address from, address to, uint256 value, bytes memory data) public returns (bool) {
+		_allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
+		_transfer(from, to, value, data);
 		Approval(from, msg.sender, _allowed[from][msg.sender]);
 		return true;
 	}
@@ -223,16 +226,29 @@ contract ERC20 is IERC20 {
 		Approval(msg.sender, spender, _allowed[msg.sender][spender]);
 		return true;
 	}
+	function isContract(address account) private view returns (bool) {
+		// This method relies in extcodesize, which returns 0 for contracts in
+		// construction, since the code is only stored at the end of the
+		// constructor execution.
 
+		uint256 size;
+		// solhint-disable-next-line no-inline-assembly
+		assembly { size := extcodesize(account) }
+		return size > 0;
+	}
 	/**
 	* @dev Transfer token for a specified addresses
 	* @param from The address to transfer from.
 	* @param to The address to transfer to.
 	* @param value The amount to be transferred.
 	*/
-	function _transfer(address from, address to, uint256 value) internal {
+	function _transfer(address from, address to, uint256 value, bytes memory data) internal {
 		_balances[from] = _balances[from].sub(value);
 		_balances[to] = _balances[to].add(value);
+		if(isContract(to)) {
+			IERC223Recipient receiver = IERC223Recipient(to);
+			receiver.tokenFallback(msg.sender, value, data);
+		}
 		Transfer(from, to, value);
 	}
 
@@ -327,36 +343,7 @@ contract IERC223Recipient {
 	function tokenFallback(address _from, uint _value, bytes memory _data) public;
 }
 
-contract IERC223 {
-	/**
-	 * @dev Returns the total supply of the token.
-	 */
-	uint public _totalSupply;
-	
-	/**
-	 * @dev Returns the balance of the `who` address.
-	 */
-	function balanceOf(address who) external view returns (uint);
-		
-	/**
-	 * @dev Transfers `value` tokens from `msg.sender` to `to` address
-	 * and returns `true` on success.
-	 */
-	function transfer(address to, uint value) external returns (bool);
-		
-	/**
-	 * @dev Transfers `value` tokens from `msg.sender` to `to` address with `data` parameter
-	 * and returns `true` on success.
-	 */
-	function transfer(address to, uint value, bytes memory data) public returns (bool);
-	 
-	 /**
-	 * @dev Event that is fired on successful transfer.
-	 */
-	event Transfer(address indexed from, address indexed to, uint value, bytes data);
-}
-
-contract UniswapV2Pair is ERC20, IUniswapV2Pair{
+contract UniswapV2Pair is ERC223NG, IUniswapV2Pair, IERC223Recipient{
 	using SafeMath  for uint;
 	using UQ112x112 for uint224;
 
@@ -560,10 +547,7 @@ contract UniswapV2Pair is ERC20, IUniswapV2Pair{
 		return (IERC20(__token0).balanceOf(address(this)), IERC20(__token1).balanceOf(address(this)));
 	}
 	// this low-level function should be called from a contract which performs important safety checks
-	function swap(uint amount0Out, uint amount1Out, address to, bytes data) external{
-		_swap(amount0Out, amount1Out, to, data);
-	}
-	function _swap(uint amount0Out, uint amount1Out, address to, bytes data) private lock {
+	function swap(uint amount0Out, uint amount1Out, address to, bytes data) external lock {
 		require(amount0Out > 0 || amount1Out > 0);
 		uint112 __reserve0;
 		uint112 __reserve1;
@@ -601,6 +585,10 @@ contract UniswapV2Pair is ERC20, IUniswapV2Pair{
 	function sync() external lock {
 		_update(IERC20(_token0).balanceOf(address(this)), IERC20(_token1).balanceOf(address(this)), _reserve0, _reserve1);
 	}
+	// wrong token protection - protects against sending the wrong token to Uniswap V2
+	function tokenFallback(address from, uint256 value, bytes memory data) public{
+		require(msg.sender == _token0 || msg.sender == _token1);
+	}
 }
 
 // File: contracts/interfaces/IUniswapV2Factory.sol
@@ -628,84 +616,7 @@ contract TokenDetails{
 	function name() public view returns (string);
 	function symbol() public view returns (string);
 }
-contract ERC223 is IERC223 {
-	using SafeMath for uint;
-
-	/**
-	 * @dev See `IERC223.totalSupply`.
-	 */
-	function totalSupply() public view returns (uint256) {
-		return _totalSupply.sub(balances[address(0)]);
-	}
-
-	mapping(address => uint) balances; // List of user balances.
-	function isContract(address account) private view returns (bool) {
-		// This method relies in extcodesize, which returns 0 for contracts in
-		// construction, since the code is only stored at the end of the
-		// constructor execution.
-
-		uint256 size;
-		// solhint-disable-next-line no-inline-assembly
-		assembly { size := extcodesize(account) }
-		return size > 0;
-	}
-	/**
-	 * @dev Transfer the specified amount of tokens to the specified address.
-	 *	  Invokes the `tokenFallback` function if the recipient is a contract.
-	 *	  The token transfer fails if the recipient is a contract
-	 *	  but does not implement the `tokenFallback` function
-	 *	  or the fallback function to receive funds.
-	 *
-	 * @param _to	Receiver address.
-	 * @param _value Amount of tokens that will be transferred.
-	 * @param _data  Transaction metadata.
-	 */
-	function transfer(address _to, uint _value, bytes memory _data) public returns (bool success){
-		// Standard function transfer similar to ERC20 transfer with no _data .
-		// Added due to backwards compatibility reasons.
-		balances[msg.sender] = balances[msg.sender].sub(_value);
-		balances[_to] = balances[_to].add(_value);
-		if(isContract(_to)) {
-			IERC223Recipient receiver = IERC223Recipient(_to);
-			receiver.tokenFallback(msg.sender, _value, _data);
-		}
-		Transfer(msg.sender, _to, _value, _data);
-		return true;
-	}
-	
-	/**
-	 * @dev Transfer the specified amount of tokens to the specified address.
-	 *	  This function works the same with the previous one
-	 *	  but doesn't contain `_data` param.
-	 *	  Added due to backwards compatibility reasons.
-	 *
-	 * @param _to	Receiver address.
-	 * @param _value Amount of tokens that will be transferred.
-	 */
-	function transfer(address _to, uint _value) external returns (bool success){
-		bytes memory empty = hex"00000000";
-		balances[msg.sender] = balances[msg.sender].sub(_value);
-		balances[_to] = balances[_to].add(_value);
-		if(isContract(_to)) {
-			IERC223Recipient receiver = IERC223Recipient(_to);
-			receiver.tokenFallback(msg.sender, _value, empty);
-		}
-		Transfer(msg.sender, _to, _value, empty);
-		return true;
-	}
-
-	
-	/**
-	 * @dev Returns balance of the `_owner`.
-	 *
-	 * @param _owner   The address whose balance will be returned.
-	 * @return balance Balance of the `_owner`.
-	 */
-	function balanceOf(address _owner) external view returns (uint balance) {
-		return balances[_owner];
-	}
-}
-contract ERC223IMPL is ERC223 {
+contract ERC223IMPL is ERC223NG {
 	string private _name;
 	string private _symbol;
 	address private _uniswap;
@@ -713,8 +624,8 @@ contract ERC223IMPL is ERC223 {
 	function ERC223IMPL (string name, string symbol, address minter) public {
 		_name = name;
 		_symbol = symbol;
-		_totalSupply = 10000000 szabo;
-		balances[minter] = 10000000 szabo;
+		real_totalSupply = 10000000 szabo;
+		_balances[minter] = 10000000 szabo;
 	}
 
 	/**
@@ -742,10 +653,12 @@ contract IERC223TokenFactory{
 	function createToken(string name, string symbol) external returns (address);
 	function getTokenFromName(string name) external view returns (address);
 	function getTokenFromSymbol(string symbol) external view returns (address);
+	function launchedUsingThis(address token) external view returns (bool);
 }
 
 contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 	address private _centralToken;
+	address private _jessie;
 	function centralToken() external view returns (address){
 		return _centralToken;
 	}
@@ -754,12 +667,14 @@ contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 		_createdTokensByName["MintyDEFI"] = token;
 		_createdTokensBySymbol["MDFI"] = token;
 		_centralToken = token;
+		_launchedUsingThis[token] = true;
+		_jessie = msg.sender;
 	}
 	function feeTo() external view returns (address){
-		return 0xc587dD89a3FFc2e230FD5FF81121A3df12F27b80;
+		return _jessie;
 	}
 	function feeToSetter() external view returns (address){
-		return 0xc587dD89a3FFc2e230FD5FF81121A3df12F27b80;
+		return _jessie;
 	}
 
 	mapping(address => mapping(address => address)) private _getPair;
@@ -777,6 +692,8 @@ contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 		return _allPairs.length;
 	}
 	
+	mapping(address => bool) private _launchedUsingThis;
+	
 	function _createPair(address tokenA, address tokenB) private returns (address pair) {
 		require(tokenA != tokenB);
 		(tokenA, tokenB) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
@@ -787,6 +704,9 @@ contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 		_getPair[tokenB][tokenA] = pair; // populate mapping in the reverse direction
 		_allPairs.push(pair);
 		PairCreated(tokenA, tokenB, pair, _allPairs.length);
+	}
+	function launchedUsingThis(address token) external view returns (bool){
+		return _launchedUsingThis[token];
 	}
 
 	function createPair(address tokenA, address tokenB) external returns (address) {
@@ -810,6 +730,7 @@ contract CentralFactory is IUniswapV2Factory, IERC223TokenFactory {
 		_createPair(_centralToken, token);
 		_createdTokensByName[name] = token;
 		_createdTokensBySymbol[symbol] = token;
+		_launchedUsingThis[token] = true;
 	}
 	function getTokenFromName(string name) external view returns (address){
 		return _createdTokensByName[name];
