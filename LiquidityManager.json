@@ -1,0 +1,176 @@
+[
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "tokenA",
+				"type": "address"
+			},
+			{
+				"name": "tokenB",
+				"type": "address"
+			}
+		],
+		"name": "sortTokens",
+		"outputs": [
+			{
+				"name": "token0",
+				"type": "address"
+			},
+			{
+				"name": "token1",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "token",
+				"type": "address"
+			},
+			{
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "safeTransferFrom2",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "uniswapFactory",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "amountA",
+				"type": "uint256"
+			},
+			{
+				"name": "reserveA",
+				"type": "uint256"
+			},
+			{
+				"name": "reserveB",
+				"type": "uint256"
+			}
+		],
+		"name": "quote",
+		"outputs": [
+			{
+				"name": "amountB",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_from",
+				"type": "address"
+			},
+			{
+				"name": "_value",
+				"type": "uint256"
+			},
+			{
+				"name": "_data",
+				"type": "bytes"
+			}
+		],
+		"name": "tokenFallback",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "tokenA",
+				"type": "address"
+			},
+			{
+				"name": "tokenB",
+				"type": "address"
+			},
+			{
+				"name": "amountADesired",
+				"type": "uint256"
+			},
+			{
+				"name": "amountBDesired",
+				"type": "uint256"
+			}
+		],
+		"name": "addLiquidity",
+		"outputs": [
+			{
+				"name": "amountA",
+				"type": "uint256"
+			},
+			{
+				"name": "amountB",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "tokenA",
+				"type": "address"
+			},
+			{
+				"name": "tokenB",
+				"type": "address"
+			}
+		],
+		"name": "getReserves",
+		"outputs": [
+			{
+				"name": "reserveA",
+				"type": "uint256"
+			},
+			{
+				"name": "reserveB",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
