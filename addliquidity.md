@@ -1,6 +1,6 @@
 # How to add liquidity to an Uniswap V2 pair on MintyDEFI
 
-Step 1 - grant spending approval to th liquidity manager
+Step 1 - grant spending approval to the liquidity manager
 
 [Here's an instruction on how to grant spending approval](https://github.com/EUBIToken/MintyDEFI/blob/main/approve.md)
 
