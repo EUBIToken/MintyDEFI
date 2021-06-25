@@ -4,7 +4,7 @@
 
 ### Phrase 1 - Completely deploy Uniswap
 
-25/06/2021 - UniswapV2Router3 launch
+25/06/2021 - UniswapV2Router3 launch - completed
 
 ### Phrase 2 - Enchanced token implementations
 
