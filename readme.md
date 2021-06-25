@@ -25,3 +25,15 @@ We introduced a DeFi exchange to MintME with the hope of solving the biggest pro
 ### Phrase 3 - Extending the DeFi Ecosystem
 
 09/07/2021 - SafeDeFi token: provide liquidity on margin with a stop loss
+
+## How to use MintyDEFI
+
+All you need is a MintME wallet and some MintME to pay for gas to use MintyDEFI.
+
+[How to add an approved spender for an ERC-20 token](https://github.com/EUBIToken/MintyDEFI/blob/main/approve.md)
+
+[How to add liquidity to an Uniswap V2 pair on MintyDEFI](https://github.com/EUBIToken/MintyDEFI/blob/main/addliquidity.md)
+
+[How to create a token on MintyDEFI](https://github.com/EUBIToken/MintyDEFI/blob/main/createtoken.md)
+
+[How to swap tokens on MintyDEFI](https://github.com/EUBIToken/MintyDEFI/blob/main/swap.md)
