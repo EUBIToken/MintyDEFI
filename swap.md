@@ -26,7 +26,7 @@ The contract's address is 0xfb5098f705770fa9f003ac177f49c137932a5219
 
 FromToken and ToTokens should be the token contract addresses of which token are you swapping from and which token are you swapping to. If no Uniswap V2 pairs exist for those 2 tokens, the transaction will fail harmlessly. AmountIn should be the number of raw units of tokens you want to send to Uniswap V2. The router will do it's best to get you the best possible rate or exchange.
 
-NOTE: the [ethereum unit converter] can convert between decimal units and raw units. As you see, we are swapping 1 TEST token for some MDFI tokens.
+NOTE: the [ethereum unit converter](https://eth-converter.com/extended-converter.html) can convert between decimal units and raw units. As you see, we are swapping 1 TEST token for some MDFI tokens.
 
 ![image](https://user-images.githubusercontent.com/55774978/123363952-c795d800-d59d-11eb-97bf-8e089784bb4a.png)
 
