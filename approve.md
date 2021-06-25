@@ -1,10 +1,10 @@
 # How to add an approved spender for an ERC-20 token
 
-Step 1 - get the token contract address
+### Step 1: get the token contract address
 
 ![image](https://user-images.githubusercontent.com/55774978/122696803-2988d180-d26e-11eb-98d1-eec5b902ec2d.png)
 
-Step 2 - input the token address and ABI/JSON Interface into your wallet's interact menu
+### Step 2: input the token address and ABI/JSON Interface into your wallet's interact menu
 
 ![image](https://user-images.githubusercontent.com/55774978/122696981-943a0d00-d26e-11eb-89b5-1dababcee2d7.png)
 
@@ -12,7 +12,7 @@ Step 2 - input the token address and ABI/JSON Interface into your wallet's inter
 
 [you can copy and paste this default ERC-20 ABI/JSON Interface over, since it works for all ERC-20 tokens](https://raw.githubusercontent.com/EUBIToken/LLToken/main/IERC20.json)
 
-Step 3 - set spending allowance
+### Step 3: set spending allowance
 
 ![image](https://user-images.githubusercontent.com/55774978/122697163-f3981d00-d26e-11eb-8004-e12b7ff646aa.png)
 
