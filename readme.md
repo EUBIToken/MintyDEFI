@@ -8,7 +8,7 @@ MintME.com uses an order book model despite it's extremely small market size, wh
 
 ## Solution
 
-We introduced a DeFi exchange to MintME with the hope of solving the biggest problem plauging the MintME ecosystem. We hope that we can replace MintME.com with a DeFi exchange, since MintME.com have critical design flaws that hurt the market in fundamental ways. We will initially use Uniswap V2, but we have intentions on launching a DEX specially designed for ERC-223 tokens and MintME.com in the future.
+We introduced a DeFi exchange to MintME with the hope of solving the biggest problem plauging the MintME ecosystem. We hope that we can replace MintME.com with a DeFi exchange, since MintME.com have critical design flaws that hurt the market in fundamental ways. We will initially use Uniswap V2, but we have intentions on launching a DEX specially designed for ERC-223 tokens and MintME in the future.
 
 ## Roadmap
 
