@@ -1,10 +1,10 @@
 # How to add liquidity to an Uniswap V2 pair on MintyDEFI
 
-Step 1 - grant spending approval to the liquidity manager
+### Step 1: grant spending approval to the liquidity manager
 
 [Here's an instruction on how to grant spending approval](https://github.com/EUBIToken/MintyDEFI/blob/main/approve.md)
 
-NOTE: despite the fact that tokens deployed via MintyDEFI are called ERC-223 tokens, they have full backward compartiability for ERC-20 Spending Approval, since we have to send 2 diffrent tokens to to a smart contract at once here.
+NOTE: despite the fact that tokens deployed via MintyDEFI are called ERC-223 tokens, they have full backward compartiability for ERC-20 Spending Approval, since we have to send 2 diffrent tokens to a smart contract at once here.
 
 address: 0x16d83191c561fa6ecdb91b0e0a9e0b3642d0e80d
 
@@ -12,7 +12,7 @@ value: 1157920892373161954235709850086879078532699846656405640394575840079131296
 
 [It's safe to grant unlimited spending approval due to this safety check in the code](https://github.com/EUBIToken/MintyDEFI/blob/main/MintMEUniswapLiquidityManager.sol#L227)
 
-Step 2 - Put the JSON/ABI and contract address into your wallet
+### Step 2: Put the JSON/ABI and contract address into your wallet
 
 Contract address: 0x16d83191c561fa6ecdb91b0e0a9e0b3642d0e80d
 
@@ -20,7 +20,7 @@ Contract address: 0x16d83191c561fa6ecdb91b0e0a9e0b3642d0e80d
 
 ![image](https://user-images.githubusercontent.com/55774978/123067127-e891e800-d43a-11eb-8fd6-637afdf2988f.png)
 
-Step 3 - enter the details into the liquidity manager contract
+### Step 3: enter the details into the liquidity manager contract
 
 TokenA and TokenB should be token addresses for both tokens. If no Uniswap V2 pair exists for the aforementioned tokens, then the Uniswap V2 pair will be automatically created.
 
@@ -32,7 +32,7 @@ You can use the [extended ethereum unit converter](https://eth-converter.com/ext
 
 ![image](https://user-images.githubusercontent.com/55774978/123067646-5c33f500-d43b-11eb-8cc2-aa39395472de.png)
 
-Step 4 - confirm the transaction, and you're now officially a liquidity provider for MintyDEFI.
+### Step 4: confirm the transaction, and you're now officially a liquidity provider for MintyDEFI.
 
 ![image](https://user-images.githubusercontent.com/55774978/123068124-ce0c3e80-d43b-11eb-96ab-996c3d7b8a69.png)
 
