@@ -4,7 +4,7 @@
 
 [Here's an instruction on how to grant spending approval](https://github.com/EUBIToken/MintyDEFI/blob/main/approve.md)
 
-NOTE: despite the fact that tokens deployed via MintyDEFI are called ERC-223 tokens, they have full backward compartiability for ERC-20 Spending Approval, since we have to send 2 diffrent tokens to a smart contract at once here. Also, you only need to grant spending approval when adding liquidity for the first time.
+NOTE: despite the fact that tokens deployed via MintyDEFI are called ERC-223 tokens, they have full backward compartiability for ERC-20 Spending Approval, since we have to send 2 diffrent tokens to a smart contract at once here. Also, you only need to grant spending approval if you are adding a specific token into the liquidity pool for the first time. For example, if you add EUBI and LIBAS to the liquidity pool, and then add EUBI and 1000x to the liquidity pool, you don't need to grant spending approval for EUBI on the second transaction.
 
 address: 0x16d83191c561fa6ecdb91b0e0a9e0b3642d0e80d
 
