@@ -4,7 +4,7 @@
 
 [Here's an instruction on how to grant spending approval](https://github.com/EUBIToken/MintyDEFI/blob/main/approve.md)
 
-NOTE: despite the fact that tokens deployed via MintyDEFI are called ERC-223 tokens, they have full backward compartiability for ERC-20 Spending Approval, since we have to specify which token are we swapping to.
+NOTE: despite the fact that tokens deployed via MintyDEFI are called ERC-223 tokens, they have full backward compartiability for ERC-20 Spending Approval, since we have to specify which token are we swapping to. Also, you only need to grant spending approval on the first time you swap from any tokens. For example, if you swap EUBI for LIBAS, and then swap EUBI for 1000x, you only need to grant spending approval for EUBI on the first transaction.
 
 [It's safe to grant unlimited spending approval due to this safety check in the code](https://github.com/EUBIToken/MintyDEFI/blob/main/MintMEUniswapRouter.sol#L173)
 
