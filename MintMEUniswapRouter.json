@@ -1,12 +1,52 @@
 [
 	{
 		"constant": true,
-		"inputs": [],
-		"name": "name",
+		"inputs": [
+			{
+				"name": "amountIn",
+				"type": "uint256"
+			},
+			{
+				"name": "reserveIn",
+				"type": "uint256"
+			},
+			{
+				"name": "reserveOut",
+				"type": "uint256"
+			}
+		],
+		"name": "getAmountOut",
+		"outputs": [
+			{
+				"name": "amountOut",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "fromToken",
+				"type": "address"
+			},
+			{
+				"name": "toToken",
+				"type": "address"
+			},
+			{
+				"name": "amountIn",
+				"type": "uint256"
+			}
+		],
+		"name": "precalculate",
 		"outputs": [
 			{
 				"name": "",
-				"type": "string"
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -17,21 +57,20 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "spender",
+				"name": "token",
 				"type": "address"
 			},
 			{
-				"name": "value",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"name": "amount",
 				"type": "uint256"
 			}
 		],
-		"name": "approve",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
+		"name": "safeTransferFrom2",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -39,11 +78,11 @@
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "totalSupply",
+		"name": "uniswapFactory",
 		"outputs": [
 			{
 				"name": "",
-				"type": "uint256"
+				"type": "address"
 			}
 		],
 		"payable": false,
@@ -54,164 +93,44 @@
 		"constant": false,
 		"inputs": [
 			{
-				"name": "from",
+				"name": "_from",
 				"type": "address"
 			},
 			{
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"name": "value",
+				"name": "_value",
 				"type": "uint256"
-			}
-		],
-		"name": "transferFrom",
-		"outputs": [
+			},
 			{
-				"name": "",
-				"type": "bool"
+				"name": "_data",
+				"type": "bytes"
 			}
 		],
+		"name": "tokenFallback",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "decimals",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "symbol",
-		"outputs": [
-			{
-				"name": "",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"constant": false,
 		"inputs": [
 			{
-				"name": "to",
+				"name": "fromToken",
 				"type": "address"
 			},
 			{
-				"name": "value",
+				"name": "toToken",
+				"type": "address"
+			},
+			{
+				"name": "amountIn",
 				"type": "uint256"
 			}
 		],
-		"name": "transfer",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
+		"name": "swap",
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "allowance",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Approval",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
 	}
 ]
