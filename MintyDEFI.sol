@@ -587,7 +587,7 @@ contract UniswapV2Pair is ERC223NG, IUniswapV2Pair, IERC223Recipient{
 	}
 	// wrong token protection - protects against sending the wrong token to Uniswap V2
 	function tokenFallback(address from, uint256 value, bytes memory data) public{
-		require(msg.sender == _token0 || msg.sender == _token1);
+		require(msg.sender == _token0 || msg.sender == _token1 || msg.sender == address(this));
 	}
 }
 
