@@ -174,8 +174,20 @@ contract MintMEUniswapRouter{
 		IERC20 erc20 = IERC20(token);
 		require(erc20.transferFrom(msg.sender, to, amount));
 	}
-	//note: 82000 EUBI
-	function swap(address fromToken, address toToken, uint amountIn){
+	function precalculate(address fromToken, address toToken, uint amountIn) external view returns (uint256){
+		address pairaddr = IUniswapV2Factory(uniswapFactory).getPair(fromToken, toToken);
+		require(pairaddr != address(0));
+		IUniswapV2Pair pair = IUniswapV2Pair(pairaddr);
+		uint112 reserve0;
+		uint112 reserve1;
+		(reserve0, reserve1, ) = pair.getReserves();
+		if(fromToken < toToken){
+			return getAmountOut(amountIn, reserve0, reserve1);
+		} else{
+			return getAmountOut(amountIn, reserve1, reserve0);
+		}
+	}
+	function swap(address fromToken, address toToken, uint amountIn) external{
 		address pairaddr = IUniswapV2Factory(uniswapFactory).getPair(fromToken, toToken);
 		require(pairaddr != address(0));
 		safeTransferFrom2(fromToken, pairaddr, amountIn);
