@@ -1,6 +1,6 @@
 # How to create a token on MintyDEFI
 
-### Step 1: input the token address and ABI/JSON Interface into your wallet's interact menu
+### Step 1: input the contract address and ABI/JSON Interface into your wallet's interact menu
 
 Contract address: 0x77d062eb1dd9fb48a9875c73abf6c6d247e91b39
 
