@@ -16,15 +16,7 @@ We introduced a DeFi exchange to MintME with the hope of solving the biggest pro
 
 25/06/2021 - UniswapV2Router3 launch - completed
 
-### Phrase 2 - Enchanced token implementations
-
-30/06/2021 - Token release period implementation launch
-
-02/07/2021 - Proof-Of-Stake Dividends distributor launch
-
-### Phrase 3 - Extending the DeFi Ecosystem
-
-09/07/2021 - SafeDeFi token: provide liquidity on margin with a stop loss
+### I intend to pause development of this project since I have some personal issues and other projects to deal with currently
 
 ## How to use MintyDEFI
 
