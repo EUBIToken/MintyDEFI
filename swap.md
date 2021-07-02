@@ -18,7 +18,7 @@ value: 1157920892373161954235709850086879078532699846656405640394575840079131296
 
 ![image](https://user-images.githubusercontent.com/55774978/123363010-dda29900-d59b-11eb-9daf-389824e6ad9a.png)
 
-The contract's address is 0xfb5098f705770fa9f003ac177f49c137932a5219
+The contract's address is 0x0ed0de66e3b5cb657fdb271dc4df3f679cffdc3a
 
 [you can copy and paste this ABI/JSON interface over](https://raw.githubusercontent.com/EUBIToken/MintyDEFI/main/MintMEUniswapRouter.json)
 
