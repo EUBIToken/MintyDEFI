@@ -29,3 +29,5 @@ All you need is a MintME wallet and some MintME to pay for gas to use MintyDEFI.
 [How to create a token on MintyDEFI](https://github.com/EUBIToken/MintyDEFI/blob/main/createtoken.md)
 
 [How to swap tokens on MintyDEFI](https://github.com/EUBIToken/MintyDEFI/blob/main/swap.md)
+
+[How to use MintME on MintyDEFI](https://github.com/EUBIToken/MintyDEFI/blob/main/WrappedMintME.md)
