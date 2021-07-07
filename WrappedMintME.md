@@ -14,6 +14,10 @@ ABI/JSON interface URL: https://raw.githubusercontent.com/EUBIToken/MintyDEFI/ma
 
 Token contract address: 0x4a89e12f7109c9b27f50eb18d542f84c2ca5c0ec
 
+Token symbol: WMNT
+
+Decimals: 12
+
 ## Wrapping
 
 ### Step 1: Input the token address and ABI/JSON interface into your wallet's interact menu
