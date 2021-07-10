@@ -24,7 +24,9 @@ Contract address: 0x16d83191c561fa6ecdb91b0e0a9e0b3642d0e80d
 
 TokenA and TokenB should be token addresses for both tokens. If no Uniswap V2 pair exists for the aforementioned tokens, then the Uniswap V2 pair will be automatically created.
 
-AmountADesired and AmountBDesired should be the maximum amount of raw units you want to provide as liquidity for each tokens
+AmountADesired and AmountBDesired should be the maximum amount of raw units you want to provide as liquidity for each tokens.
+
+NOTE: you should add liquidity at a ratio that matches the off-chain exchange rate to protect against arbitrage.
 
 ![image](https://user-images.githubusercontent.com/55774978/123067800-808fd180-d43b-11eb-8ea4-f46c1f55e1fc.png)
 
