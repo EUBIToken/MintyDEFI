@@ -202,6 +202,25 @@ contract MintMEUniswapRouter{
 			pair.swap(getAmountOut(amountIn, reserve1, reserve0), 0, msg.sender, empty);
 		}
 	}
+	function swap2(address fromToken, address toToken, uint amountIn, uint minAmountOut) external{
+		address pairaddr = IUniswapV2Factory(uniswapFactory).getPair(fromToken, toToken);
+		require(pairaddr != address(0));
+		safeTransferFrom2(fromToken, pairaddr, amountIn);
+		bytes memory empty = "";
+		IUniswapV2Pair pair = IUniswapV2Pair(pairaddr);
+		uint112 reserve0;
+		uint112 reserve1;
+		(reserve0, reserve1, ) = pair.getReserves();
+		if(fromToken < toToken){
+			uint256 outamt = getAmountOut(amountIn, reserve0, reserve1);
+			require(outamt >= minAmountOut);
+			pair.swap(0, outamt, msg.sender, empty);
+		} else{
+			uint256 outamt2 = getAmountOut(amountIn, reserve1, reserve0);
+			require(outamt2 >= minAmountOut);
+			pair.swap(outamt2, 0, msg.sender, empty);
+		}
+	}
 	function tokenFallback(address _from, uint _value, bytes memory _data) public{
 		require(IERC20(msg.sender).transfer(msg.sender, _value));
 		IUniswapV2Pair(msg.sender).burn(_from);
